@@ -1,0 +1,12 @@
+import { reducer, initState } from './src/simulator/store.js';
+let st = initState(); const d = (a) => { st = reducer(st, a); };
+d({ type: 'cfg', cfg: { algo: 'RR', quantum: 2 } });
+for (let i = 0; i < 6; i++) d({ type: 'step' });
+console.log('t=6 running', st.os.sim.running, 'history', st.history.length);
+d({ type: 'rewind', t: 2 }); console.log('rewind t=2 -> time', st.os.sim.time, 'history', st.history.length);
+d({ type: 'view', view: 'TERMINAL' }); console.log('view switch keeps time', st.os.sim.time);
+d({ type: 'boot' }); d({ type: 'syscall', name: 'CREATE_PROCESS', args: { name: 'X', burst: 3 } });
+console.log('procs', st.os.sim.procs.length, 'log', st.os.kernel.log.length);
+d({ type: 'priority', pid: 'P002', priority: 5 }); console.log('prio', st.os.sim.procs[1].priority);
+d({ type: 'run' }); for (let i = 0; i < 60; i++) d({ type: 'step' });
+console.log('done', st.os.sim.procs.every(p => p.state === 'TERMINATED'), 'running flag', st.running, 'ctx', st.os.sim.ctx);
